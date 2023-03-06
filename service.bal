@@ -1,5 +1,5 @@
 //import ballerina/log;
-import ballerina/io;
+//import ballerina/io;
 import ballerina/http;
 import ballerinax/azure_cosmosdb as cosmosdb;
 configurable config cosmosConfig =?;
@@ -12,20 +12,20 @@ service / on new http:Listener(8090) {
         };
         cosmosdb:DataPlaneClient azureCosmosClient = check new (configuration);
 
-        string query = string `SELECT c.reportReference,c.asset FROM vmsContainer c WHERE c.scanner_type = 'trivy'`;
+        string query = string `SELECT c.asset,c.vulnerabilities FROM vmsContainer c WHERE c.scanner_type = 'trivy'`;
 
         json[] outputs = [];
-        stream<ScanRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
+        stream<record {}, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
         //json[] theData = check from var rec in result select rec;
-        check result.forEach(function(ScanRecord gdsl){
+        check result.forEach(function(record {} gdsl){
             outputs.push(gdsl.toJson());
         });
-        check result.forEach(isolated function (ScanRecord queryResult) {
-            io:println(queryResult.toJson());
-            //outputs.push(queryResult.toJson());
-            //string singleRecord = queryResult.toJsonString();
+        // check result.forEach(isolated function (ScanRecord queryResult) {
+        //     io:println(queryResult.toJson());
+        //     //outputs.push(queryResult.toJson());
+        //     //string singleRecord = queryResult.toJsonString();
 
-        });
+        // });
         // foreach ScanRecord rec in result {
             
         // }
