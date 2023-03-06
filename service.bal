@@ -5,7 +5,7 @@ import ballerinax/azure_cosmosdb as cosmosdb;
 configurable config cosmosConfig =?;
 
 service / on new http:Listener(8090) {
-    resource function get invictiScanList() returns json[]|error {
+    resource function get invictiScanList() returns json|error {
         cosmosdb:ConnectionConfig configuration = {
             baseUrl: cosmosConfig.baseUrl,
             primaryKeyOrResourceToken:cosmosConfig.primaryKey
@@ -29,7 +29,8 @@ service / on new http:Listener(8090) {
         // foreach ScanRecord rec in result {
             
         // }
-        return outputs;
+        json finalOutput = { "results":outputs};
+        return finalOutput;
     }
 }
 
