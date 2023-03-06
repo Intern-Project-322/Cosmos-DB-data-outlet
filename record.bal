@@ -28,10 +28,23 @@ type config record {
 type ScanRecord record{
    string? asset = "";
    string? team = "";
-   Vulnerability[]? vulnerabilities = [];
+   Vulnerability[] vulnerabilities = [];
 };
 
 type Vulnerability record{
+    string? title = "";
+    string? description = "";
+    string? severity = "";
+    string? url = "";
+    string? cve = "";
+  	string? component_name = "";
+    string? component_path = "";
+    string? component_type = "";
+};
+
+type CompleteVulnerability record{
+    string? asset = "";
+    string? team = "";
     string? title = "";
     string? description = "";
     string? severity = "";

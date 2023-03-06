@@ -18,7 +18,22 @@ service / on new http:Listener(8090) {
         stream<ScanRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
         //json[] theData = check from var rec in result select rec;
         check result.forEach(function(ScanRecord scanRecord){
-            outputs.push(scanRecord.toJson());
+            Vulnerability[] vulnerabilityList = scanRecord.vulnerabilities;
+            vulnerabilityList.forEach(function(Vulnerability vuln){
+                CompleteVulnerability compRecord = {
+                    asset: scanRecord.asset,
+                    team: scanRecord.team,
+                    title: vuln.title,
+                    description: vuln.description,
+                    severity: vuln.severity,
+                    url: vuln.url,
+                    cve: vuln.cve,
+                    component_name: vuln.component_name,
+                    component_path: vuln.component_path,
+                    component_type: vuln.component_name
+                };
+                outputs.push(compRecord.toJson());
+            });
         });
         // check result.forEach(isolated function (ScanRecord queryResult) {
         //     io:println(queryResult.toJson());
