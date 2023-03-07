@@ -47,8 +47,6 @@ service / on new http:Listener(8090) {
         json finalOutput = { "results":outputs};
         return finalOutput;
     }
-}
-service / on new http:Listener(9090) {
     resource function get rowScanData() returns json|error {
         cosmosdb:ConnectionConfig configuration = {
             baseUrl: cosmosConfig.baseUrl,
@@ -77,7 +75,6 @@ service / on new http:Listener(9090) {
         return finalOutput;
     }
 }
-
 
 
 
