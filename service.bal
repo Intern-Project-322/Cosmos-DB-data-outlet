@@ -47,7 +47,7 @@ service / on new http:Listener(8090) {
         json finalOutput = { "results":outputs};
         return finalOutput;
     }
-    resource function get rowScanData() returns json|error {
+    resource function get rawScanData() returns json |error {
         cosmosdb:ConnectionConfig configuration = {
             baseUrl: cosmosConfig.baseUrl,
             primaryKeyOrResourceToken:cosmosConfig.primaryKey
@@ -57,20 +57,11 @@ service / on new http:Listener(8090) {
         string query = string `SELECT c.asset,c.team,c.vulnerabilities FROM vmsContainer c WHERE c.scanner_type = 'trivy'`;
 
         json[] outputs = [];
-        stream<ScanRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
-        //json[] theData = check from var rec in result select rec;
-        check result.forEach(function(ScanRecord scanRecord){
+        stream<ScanRecord,error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
+        check result.forEach(function(ScanRecord scanRecord) {
             outputs.push(scanRecord.toJson());
         });
-        // check result.forEach(isolated function (ScanRecord queryResult) {
-        //     io:println(queryResult.toJson());
-        //     //outputs.push(queryResult.toJson());
-        //     //string singleRecord = queryResult.toJsonString();
-
-        // });
-        // foreach ScanRecord rec in result {
-            
-        // }
+        //return {"status":"success"};
         json finalOutput = { "results":outputs};
         return finalOutput;
     }
