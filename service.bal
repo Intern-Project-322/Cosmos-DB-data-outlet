@@ -25,7 +25,7 @@ service / on new http:Listener(8090) {
 
         time:Utc afterConfigCheck = time:utcNow();
         int timeafterConfigCheck= afterConfigCheck[0];
-        io:println(`Number of seconds before Config: ${afterConfigCheck[0]}s`);
+        io:println(`Number of seconds after Config check: ${afterConfigCheck[0]}s`);
 
         string query = string `SELECT c.asset,c.team,c.vulnerabilities FROM vmsContainer c WHERE c.scanner_type = 'trivy'`;
 
