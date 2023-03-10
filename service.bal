@@ -1,4 +1,4 @@
-import ballerina/log;
+//import ballerina/log;
 import ballerina/time;
 import ballerina/io;
 import ballerina/http;
@@ -8,11 +8,24 @@ configurable config cosmosConfig =?;
 
 service / on new http:Listener(8090) {
     resource function get invictiScanList() returns json|error {
+
+        time:Utc beforeConfig = time:utcNow();
+        int timeBeforeConfig= beforeConfig[0];
+        io:println(`Number of seconds before Config: ${beforeConfig[0]}s`);
+
         cosmosdb:ConnectionConfig configuration = {
             baseUrl: cosmosConfig.baseUrl,
             primaryKeyOrResourceToken:cosmosConfig.primaryKey
         };
+        time:Utc afterConfig = time:utcNow();
+        int timeafterConfig= afterConfig[0];
+        io:println(`Number of seconds after Config: ${afterConfig[0]}s`);
+
         cosmosdb:DataPlaneClient azureCosmosClient = check new (configuration);
+
+        time:Utc afterConfigCheck = time:utcNow();
+        int timeafterConfigCheck= afterConfigCheck[0];
+        io:println(`Number of seconds before Config: ${afterConfigCheck[0]}s`);
 
         string query = string `SELECT c.asset,c.team,c.vulnerabilities FROM vmsContainer c WHERE c.scanner_type = 'trivy'`;
 
@@ -51,7 +64,10 @@ service / on new http:Listener(8090) {
         int timeafterParsing= afterParsing[0];
         io:println(`Number of seconds after Parsing: ${afterParsing[0]}s`);
 
-        json finalOutput = { "beforeFetching":timeBeforeFetching,
+        json finalOutput = { "beforeConfig":timeBeforeConfig,
+                             "afterConfig":timeafterConfig,
+                             "afterConfigCheck":timeafterConfigCheck,
+                             "beforeFetching":timeBeforeFetching,
                              "afterFetching":timeafterFetching,
                              "afterParsing":timeafterParsing,
                              "results":outputs};
@@ -67,39 +83,21 @@ service / on new http:Listener(8090) {
         string query = string `SELECT c.asset,c.team,c.vulnerabilities FROM vmsContainer c WHERE c.scanner_type = 'trivy'`;
 
         json[] outputs = [];
-        json[] testingOutputs = [];
-        boolean isError = false;
 
         time:Utc beforeFetching = time:utcNow();
         int timeBeforeFetching= beforeFetching[0];
         io:println(`Number of seconds before fetching: ${beforeFetching[0]}s`);
 
-       stream<ScanRecord,error?>|error result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
+        stream<ScanRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
        
         time:Utc afterFetching = time:utcNow();
         int timeafterFetching= afterFetching[0];
         io:println(`Number of seconds after fetching: ${afterFetching[0]}s`);
 
+        check result.forEach(function(ScanRecord scanRecord){
+           outputs.push(scanRecord.toJson());
+        });
 
-       if(result is stream<ScanRecord,error?>){
-            error? e = result.forEach( function(ScanRecord queryResult) {
-                            log:printInfo(queryResult.toString());
-                            testingOutputs.push(queryResult.toJson());
-            });
-            if (e is error) {
-                        log:printInfo(msg = e.message());
-                        outputs.push({status:"error in for loop"});
-                        isError = true;
-            }else {
-                outputs.push(e.toJson());
-            }
-       }else{
-        outputs.push({status:"error"});
-       }
-       
-       if(!isError){
-            outputs = testingOutputs;
-       }
         time:Utc afterParsing = time:utcNow();
         int timeafterParsing= afterParsing[0];
         io:println(`Number of seconds after Parsing: ${afterParsing[0]}s`);
@@ -113,5 +111,3 @@ service / on new http:Listener(8090) {
 }
 
 //https://ballerina.io/learn/by-example/time-utc/
-
-
