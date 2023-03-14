@@ -80,7 +80,7 @@ service / on new http:Listener(8090) {
         };
         cosmosdb:DataPlaneClient azureCosmosClient = check new (configuration);
 
-        string query = string `SELECT t.title,t.description FROM c JOIN t IN c.vulnerabilities FROM vmsContainer c WHERE c.scanner_type = 'trivy'`;
+        string query = string `SELECT t.title,t.description FROM c JOIN t IN c.vulnerabilities WHERE c.id="wso2mi-1.1.1" AND c.reportID = 635663253`;
 
         json[] outputs = [];
 
