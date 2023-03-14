@@ -82,7 +82,7 @@ service / on new http:Listener(8090) {
 
         string query = string `SELECT c.asset,c.team,t.title,t.description,t.severity,t.cve,t.url FROM c JOIN t IN c.vulnerabilities WHERE c.scanner_type = 'trivy'`;
 
-        json[] outputs = [];
+        //json[] outputs = [];
 
         time:Utc beforeFetching = time:utcNow();
         int timeBeforeFetching= beforeFetching[0];
@@ -94,18 +94,18 @@ service / on new http:Listener(8090) {
         int timeafterFetching= afterFetching[0];
         io:println(`Number of seconds after fetching: ${afterFetching[0]}s`);
 
-        check result.forEach(function(JsonCompleteVulnerability scanRecord){
-           outputs.push(scanRecord);
-        });
+        // check result.forEach(function(JsonCompleteVulnerability scanRecord){
+        //    outputs.push(scanRecord);
+        // });
+        JsonCompleteVulnerability[] outputs = check from JsonCompleteVulnerability vulnRecord in result  select vulnRecord;
 
         time:Utc afterParsing = time:utcNow();
         int timeafterParsing= afterParsing[0];
         io:println(`Number of seconds after Parsing: ${afterParsing[0]}s`);
 
-        json finalOutput = { "beforeFetching":timeBeforeFetching,
+        return { "beforeFetching":timeBeforeFetching,
                              "afterFetching":timeafterFetching,
                              "afterParsing":timeafterParsing,
                              "results":outputs};
-        return finalOutput;
     }
 }
