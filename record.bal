@@ -71,3 +71,13 @@ type JsonVulnerability record{|
     string? component_type = "";
     json...;
 |};
+
+type JsonCompleteVulnerability record{|
+    string? asset = "";
+    string? team = "";
+    string? title = "";
+    string? description = "";
+    string? severity = "";
+    string? url = "";
+    string? cve = "";
+|};
