@@ -80,7 +80,7 @@ service / on new http:Listener(8090) {
         };
         cosmosdb:DataPlaneClient azureCosmosClient = check new (configuration);
 
-        string query = string `SELECT c.asset,c.team,c.vulnerabilities FROM vmsContainer c WHERE c.scanner_type = 'trivy'`;
+        string query = string `SELECT c.asset,c.team,c.vulnerabilities.title FROM vmsContainer c WHERE c.scanner_type = 'trivy'`;
 
         json[] outputs = [];
 
@@ -88,14 +88,14 @@ service / on new http:Listener(8090) {
         int timeBeforeFetching= beforeFetching[0];
         io:println(`Number of seconds before fetching: ${beforeFetching[0]}s`);
 
-        stream<JsonScanRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
+        stream<record {}, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
        
         time:Utc afterFetching = time:utcNow();
         int timeafterFetching= afterFetching[0];
         io:println(`Number of seconds after fetching: ${afterFetching[0]}s`);
 
-        check result.forEach(function(JsonScanRecord scanRecord){
-           outputs.push(scanRecord);
+        check result.forEach(function(record {} scanRecord){
+           outputs.push(scanRecord.toJson());
         });
 
         time:Utc afterParsing = time:utcNow();
