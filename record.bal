@@ -54,3 +54,19 @@ type CompleteVulnerability record{
     string? component_path = "";
     string? component_type = "";
 };
+type JsonScanRecord record{|
+   string? asset = "";
+   string? team = "";
+   JsonVulnerability[] vulnerabilities = [];
+|};
+
+type JsonVulnerability record{|
+    string? title = "";
+    string? description = "";
+    string? severity = "";
+    string? url = "";
+    string? cve = "";
+  	string? component_name = "";
+    string? component_path = "";
+    string? component_type = "";
+|};

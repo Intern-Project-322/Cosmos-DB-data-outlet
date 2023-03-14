@@ -88,14 +88,14 @@ service / on new http:Listener(8090) {
         int timeBeforeFetching= beforeFetching[0];
         io:println(`Number of seconds before fetching: ${beforeFetching[0]}s`);
 
-        stream<ScanRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
+        stream<JsonScanRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
        
         time:Utc afterFetching = time:utcNow();
         int timeafterFetching= afterFetching[0];
         io:println(`Number of seconds after fetching: ${afterFetching[0]}s`);
 
-        check result.forEach(function(ScanRecord scanRecord){
-           outputs.push(scanRecord.toJson());
+        check result.forEach(function(JsonScanRecord scanRecord){
+           outputs.push(scanRecord);
         });
 
         time:Utc afterParsing = time:utcNow();
