@@ -20,7 +20,7 @@ service / on new http:Listener(8090) {
 
         stream<ScanRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
        
-        check azureCosmosClient->close();
+        //check azureCosmosClient->close();
         time:Utc afterFetching = time:utcNow();
         int timeafterFetching= afterFetching[0];
 
@@ -53,7 +53,7 @@ service / on new http:Listener(8090) {
 
         stream<NonJsonScanRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
        
-        check azureCosmosClient->close();
+        //check azureCosmosClient->close();
 
         time:Utc afterFetching = time:utcNow();
         int timeafterFetching= afterFetching[0];
