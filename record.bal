@@ -69,4 +69,5 @@ type JsonVulnerability record{|
   	string? component_name = "";
     string? component_path = "";
     string? component_type = "";
+    json...;
 |};
