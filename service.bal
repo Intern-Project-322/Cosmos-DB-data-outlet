@@ -80,7 +80,7 @@ service / on new http:Listener(8090) {
         };
         cosmosdb:DataPlaneClient azureCosmosClient = check new (configuration);
 
-        string query = string `SELECT t.title,t.description FROM c JOIN t IN c.vulnerabilities WHERE c.scanner_type = 'trivy'`;
+        string query = string `SELECT c.asset,c.team,t.title,t.description,t.severity,t.cve,t.url FROM c JOIN t IN c.vulnerabilities WHERE c.scanner_type = 'trivy'`;
 
         json[] outputs = [];
 
