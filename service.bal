@@ -74,7 +74,7 @@ service / on new http:Listener(8090) {
     }
     resource function get rawScanData() returns json |error {
 
-        string query = string `SELECT c.asset,c.team,t.title,t.description,t.severity,t.cve,t.url,t.component_name,t.component_path,t.component_type FROM c JOIN t IN c.vulnerabilities WHERE c.scanner_type = 'trivy' AND c.reportID = 635663253`;
+        string query = string `SELECT c.asset,c.team,t.title,t.description,t.severity,t.cve,t.url,t.component_name,t.component_path,t.component_type FROM c JOIN t IN c.vulnerabilities WHERE c.scanner_type = 'trivy'`;
 
         time:Utc beforeFetching = time:utcNow();
         int timeBeforeFetching= beforeFetching[0];
