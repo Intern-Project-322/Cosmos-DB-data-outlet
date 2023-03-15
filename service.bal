@@ -5,6 +5,11 @@ import ballerina/http;
 import ballerinax/azure_cosmosdb as cosmosdb;
 configurable config cosmosConfig =?;
 
+final cosmosdb:ConnectionConfig configuration = {
+            baseUrl: cosmosConfig.baseUrl,
+            primaryKeyOrResourceToken:cosmosConfig.primaryKey
+        };
+final cosmosdb:DataPlaneClient azureCosmosClient = check new (configuration);//final
 
 service / on new http:Listener(8090) {
     resource function get invictiScanList() returns json|error {
@@ -13,15 +18,9 @@ service / on new http:Listener(8090) {
         int timeBeforeConfig= beforeConfig[0];
         io:println(`Number of seconds before Config: ${beforeConfig[0]}s`);
 
-        cosmosdb:ConnectionConfig configuration = {
-            baseUrl: cosmosConfig.baseUrl,
-            primaryKeyOrResourceToken:cosmosConfig.primaryKey
-        };
         time:Utc afterConfig = time:utcNow();
         int timeafterConfig= afterConfig[0];
         io:println(`Number of seconds after Config: ${afterConfig[0]}s`);
-
-        cosmosdb:DataPlaneClient azureCosmosClient = check new (configuration);
 
         time:Utc afterConfigCheck = time:utcNow();
         int timeafterConfigCheck= afterConfigCheck[0];
@@ -54,7 +53,7 @@ service / on new http:Listener(8090) {
                     cve: vuln.cve,
                     component_name: vuln.component_name,
                     component_path: vuln.component_path,
-                    component_type: vuln.component_name
+                    component_type: vuln.component_type
                 };
                 outputs.push(compRecord.toJson());
             });
@@ -74,15 +73,8 @@ service / on new http:Listener(8090) {
         return finalOutput;
     }
     resource function get rawScanData() returns json |error {
-        cosmosdb:ConnectionConfig configuration = {
-            baseUrl: cosmosConfig.baseUrl,
-            primaryKeyOrResourceToken:cosmosConfig.primaryKey
-        };
-        cosmosdb:DataPlaneClient azureCosmosClient = check new (configuration);
 
-        string query = string `SELECT c.asset,c.team,t.title,t.description,t.severity,t.cve,t.url FROM c JOIN t IN c.vulnerabilities WHERE c.scanner_type = 'trivy'`;
-
-        //json[] outputs = [];
+        string query = string `SELECT c.asset,c.team,t.title,t.description,t.severity,t.cve,t.url,t.component_name,t.component_path,t.component_type FROM c JOIN t IN c.vulnerabilities WHERE c.scanner_type = 'trivy' AND c.reportID = 635663253`;
 
         time:Utc beforeFetching = time:utcNow();
         int timeBeforeFetching= beforeFetching[0];
@@ -94,9 +86,6 @@ service / on new http:Listener(8090) {
         int timeafterFetching= afterFetching[0];
         io:println(`Number of seconds after fetching: ${afterFetching[0]}s`);
 
-        // check result.forEach(function(JsonCompleteVulnerability scanRecord){
-        //    outputs.push(scanRecord);
-        // });
         JsonCompleteVulnerability[] outputs = check from JsonCompleteVulnerability vulnRecord in result  select vulnRecord;
 
         time:Utc afterParsing = time:utcNow();

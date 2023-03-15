@@ -80,4 +80,7 @@ type JsonCompleteVulnerability record{|
     string? severity = "";
     string? url = "";
     string? cve = "";
+    string? component_name = "";
+    string? component_path = "";
+    string? component_type = "";
 |};
