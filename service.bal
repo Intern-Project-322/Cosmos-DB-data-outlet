@@ -39,7 +39,7 @@ service / on new http:Listener(8090) {
     // }
     resource function get summaryTrivyScanData() returns json |error {
 
-        string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.critical,c.high,c.medium,c.low FROM c  WHERE c.scannerName = 'trivy'`;
+        string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.critical,c.high,c.medium,c.low,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = 'trivy'`;
         time:Utc beforeFetching = time:utcNow();
         int timeBeforeFetching= beforeFetching[0];
         io:println(`Number of seconds before fetching: ${beforeFetching[0]}s`);
