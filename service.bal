@@ -47,7 +47,7 @@ service / on new http:Listener(8090) {
         int timeBeforeFetching= beforeFetching[0];
         io:println(`Number of seconds before fetching: ${beforeFetching[0]}s`);
 
-        stream<record {}, error?> result = check azureCosmosClient->queryDocuments("SampleDB", "SummaryContainer", query);
+        stream<record {}, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "summaryContainer", query);
        
         time:Utc afterFetching = time:utcNow();
         int timeafterFetching= afterFetching[0];
@@ -73,7 +73,7 @@ service / on new http:Listener(8090) {
         int timeBeforeFetching= beforeFetching[0];
         io:println(`Number of seconds before fetching: ${beforeFetching[0]}s`);
 
-        stream<SummaryRecord, error?> result = check azureCosmosClient->queryDocuments("SampleDB", "SummaryContainer", query);
+        stream<SummaryRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "summaryContainer", query);
        
         time:Utc afterFetching = time:utcNow();
         int timeafterFetching= afterFetching[0];
