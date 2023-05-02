@@ -29,7 +29,67 @@ service / on new http:Listener(8090) {
         io:println(`Number of seconds after fetching: ${afterFetching[0]}s`);
 
         //JsonCompleteVulnerability[] outputs = check from JsonCompleteVulnerability vulnRecord in result  select vulnRecord;
-        json[] outputs = check from NewSummaryRecord rec in result select rec.toJson();
+        json[] outputs = [];
+        check result.forEach(function(NewSummaryRecord summaryRecord) {
+            VulnCollection oldVuln = summaryRecord.oldVuln;
+            //VulnCollection newVuln = summaryRecord.newVuln;
+            foreach string severity in severityList {
+                SeverityResoutionDetails srDetails = <SeverityResoutionDetails>oldVuln.get(severity);
+                foreach string resolution in resolutionList {
+                    NewFormattedSummaryRecord newSummaryRecord = {};
+                    newSummaryRecord.scannedDate = summaryRecord.scannedDate;
+                    newSummaryRecord.scannerName = summaryRecord.scannerName;
+                    newSummaryRecord.assetOrWebsite = summaryRecord.assetOrWebsite;
+                    newSummaryRecord.assetVersion = summaryRecord.assetVersion;
+                    newSummaryRecord.scanId = summaryRecord.scanId;
+                    newSummaryRecord.url = summaryRecord.url;
+                    newSummaryRecord.linkToVms = summaryRecord.linkToVms;
+                    newSummaryRecord.tags = summaryRecord.tags;
+                    newSummaryRecord.createdTime = summaryRecord.createdTime;
+                    newSummaryRecord.createdDate = summaryRecord.createdDate;
+                    newSummaryRecord.team = summaryRecord.team;
+                    newSummaryRecord.reportID = summaryRecord.reportID;
+                    newSummaryRecord.status = summaryRecord.status; 
+                    newSummaryRecord.status_changed_on = summaryRecord.status_changed_on;
+                    newSummaryRecord.status_changed_by = summaryRecord.status_changed_by;
+                    newSummaryRecord.newOrOld = "old";
+                    newSummaryRecord.severityResoutionType = severity+resolution;
+                    newSummaryRecord.vulnerabilityCount = srDetails.get(resolution);
+
+                    outputs.push(newSummaryRecord);
+                }
+            }
+            //VulnCollection oldVuln = summaryRecord.oldVuln;
+            VulnCollection newVuln = summaryRecord.newVuln;
+            foreach string severity in severityList {
+                SeverityResoutionDetails srDetails = <SeverityResoutionDetails>newVuln.get(severity);
+                foreach string resolution in resolutionList {
+                    NewFormattedSummaryRecord newSummaryRecord = {};
+                    newSummaryRecord.scannedDate = summaryRecord.scannedDate;
+                    newSummaryRecord.scannerName = summaryRecord.scannerName;
+                    newSummaryRecord.assetOrWebsite = summaryRecord.assetOrWebsite;
+                    newSummaryRecord.assetVersion = summaryRecord.assetVersion;
+                    newSummaryRecord.scanId = summaryRecord.scanId;
+                    newSummaryRecord.url = summaryRecord.url;
+                    newSummaryRecord.linkToVms = summaryRecord.linkToVms;
+                    newSummaryRecord.tags = summaryRecord.tags;
+                    newSummaryRecord.createdTime = summaryRecord.createdTime;
+                    newSummaryRecord.createdDate = summaryRecord.createdDate;
+                    newSummaryRecord.team = summaryRecord.team;
+                    newSummaryRecord.reportID = summaryRecord.reportID;
+                    newSummaryRecord.status = summaryRecord.status; 
+                    newSummaryRecord.status_changed_on = summaryRecord.status_changed_on;
+                    newSummaryRecord.status_changed_by = summaryRecord.status_changed_by;
+                    newSummaryRecord.newOrOld = "new";
+                    newSummaryRecord.severityResoutionType = severity+resolution;
+                    newSummaryRecord.vulnerabilityCount = srDetails.get(resolution);
+
+                    outputs.push(newSummaryRecord);
+                }
+            }
+
+            
+        });
 
         time:Utc afterParsing = time:utcNow();
         int timeafterParsing= afterParsing[0];
