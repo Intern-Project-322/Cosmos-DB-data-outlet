@@ -17,19 +17,19 @@ final string[] resolutionList = ["total","falsePositive","truePositive","batchFo
 service / on new http:Listener(8090) {
     resource function get rawTrivyScanData() returns json |error {
 
-        string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.oldVuln,c.newVuln,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = 'TrivyNew'`;
-
+        string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.critical,c.high,c.medium,c.low,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = 'trivy'`;
         time:Utc beforeFetching = time:utcNow();
         int timeBeforeFetching= beforeFetching[0];
         io:println(`Number of seconds before fetching: ${beforeFetching[0]}s`);
 
-        stream<record {}, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
+        stream<record {}, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "summaryContainer", query);
        
         time:Utc afterFetching = time:utcNow();
         int timeafterFetching= afterFetching[0];
         io:println(`Number of seconds after fetching: ${afterFetching[0]}s`);
 
-        json[] outputs = check from record {} vulnRecord in result  select vulnRecord.toJson();
+        //JsonCompleteVulnerability[] outputs = check from JsonCompleteVulnerability vulnRecord in result  select vulnRecord;
+        json[] outputs = check from record {} rec in result select rec.toJson();
 
         time:Utc afterParsing = time:utcNow();
         int timeafterParsing= afterParsing[0];
