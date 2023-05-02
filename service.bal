@@ -22,14 +22,14 @@ service / on new http:Listener(8090) {
         int timeBeforeFetching= beforeFetching[0];
         io:println(`Number of seconds before fetching: ${beforeFetching[0]}s`);
 
-        stream<record {}, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "summaryContainer", query);
+        stream<NewSummaryRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "summaryContainer", query);
        
         time:Utc afterFetching = time:utcNow();
         int timeafterFetching= afterFetching[0];
         io:println(`Number of seconds after fetching: ${afterFetching[0]}s`);
 
         //JsonCompleteVulnerability[] outputs = check from JsonCompleteVulnerability vulnRecord in result  select vulnRecord;
-        json[] outputs = check from record {} rec in result select rec.toJson();
+        json[] outputs = check from NewSummaryRecord rec in result select rec.toJson();
 
         time:Utc afterParsing = time:utcNow();
         int timeafterParsing= afterParsing[0];

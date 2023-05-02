@@ -141,3 +141,54 @@ type SeverityResoutionDetails record {|
     int fixed = 0;	
     int notAssigned = 0;
 |};
+//-------------------------newSummary---------------------------
+type NewSummaryRecord record {|
+    string? scannedDate ="";
+    string? scannerName = "";
+    string? assetOrWebsite = "";
+    string? assetVersion = "";
+    string? scanId = "";
+    string? url = "";
+    VulnCollection oldVuln;
+    VulnCollection newVuln;
+    string? linkToVms = "";
+    string? tags = "";
+    string? createdTime = "";
+    string? createdDate = "";
+    string? team = "";
+    int reportID = 0;
+    string? status = "Pending"; 
+    string? status_changed_on = "";
+    string? status_changed_by = "";
+    
+|};
+
+type VulnCollection record {|
+    SeverityResoutionDetails critical;
+    SeverityResoutionDetails high;
+    SeverityResoutionDetails medium;
+    SeverityResoutionDetails low;
+    SeverityResoutionDetails other;
+|};
+
+type NewFormattedSummaryRecord record {|
+    string? scannedDate ="";
+    string? scannerName = "";
+    string? assetOrWebsite = "";
+    string? assetVersion = "";
+    string? scanId = "";
+    string? url = "";
+    string? newOrOld = "";
+    string? severityResoutionType = "";
+    int vulnerabilityCount = 0;
+    string? linkToVms = "";
+    string? tags = "";
+    string? createdTime = "";
+    string? createdDate = "";
+    string? team = "";
+    int reportID = 0;
+    string? status = "Pending"; 
+    string? status_changed_on = "";
+    string? status_changed_by = "";
+    
+|};
