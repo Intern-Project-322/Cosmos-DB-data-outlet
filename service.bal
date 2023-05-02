@@ -15,31 +15,31 @@ final string[] severityList = ["critical","high","medium","low"];
 final string[] resolutionList = ["total","falsePositive","truePositive","batchForPatching","notAThreat","notApplicable", "inadequateInfo","alreadyMitigated","fixed","notAssigned"];
 
 service / on new http:Listener(8090) {
-    // resource function get rawTrivyScanData() returns json |error {
+    resource function get rawTrivyScanData() returns json |error {
 
-    //     string query = string `SELECT c.asset,c.team,t.title,t.description,t.severity,t.cve,t.url,t.component_name,t.component_path,t.component_type FROM c JOIN t IN c.vulnerabilities WHERE c.scanner_type = 'trivy'`;
+        string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.oldVuln,c.newVuln,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = 'TrivyNew'`;
 
-    //     time:Utc beforeFetching = time:utcNow();
-    //     int timeBeforeFetching= beforeFetching[0];
-    //     io:println(`Number of seconds before fetching: ${beforeFetching[0]}s`);
+        time:Utc beforeFetching = time:utcNow();
+        int timeBeforeFetching= beforeFetching[0];
+        io:println(`Number of seconds before fetching: ${beforeFetching[0]}s`);
 
-    //     stream<JsonCompleteVulnerability, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
+        stream<record {}, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "vmsContainer", query);
        
-    //     time:Utc afterFetching = time:utcNow();
-    //     int timeafterFetching= afterFetching[0];
-    //     io:println(`Number of seconds after fetching: ${afterFetching[0]}s`);
+        time:Utc afterFetching = time:utcNow();
+        int timeafterFetching= afterFetching[0];
+        io:println(`Number of seconds after fetching: ${afterFetching[0]}s`);
 
-    //     JsonCompleteVulnerability[] outputs = check from JsonCompleteVulnerability vulnRecord in result  select vulnRecord;
+        json[] outputs = check from record {} vulnRecord in result  select vulnRecord.toJson();
 
-    //     time:Utc afterParsing = time:utcNow();
-    //     int timeafterParsing= afterParsing[0];
-    //     io:println(`Number of seconds after Parsing: ${afterParsing[0]}s`);
+        time:Utc afterParsing = time:utcNow();
+        int timeafterParsing= afterParsing[0];
+        io:println(`Number of seconds after Parsing: ${afterParsing[0]}s`);
 
-    //     return { "beforeFetching":timeBeforeFetching,
-    //                          "afterFetching":timeafterFetching,
-    //                          "afterParsing":timeafterParsing,
-    //                          "results":outputs};
-    // }
+        return { "beforeFetching":timeBeforeFetching,
+                             "afterFetching":timeafterFetching,
+                             "afterParsing":timeafterParsing,
+                             "results":outputs};
+    }
     resource function get summaryTrivyScanData() returns json |error {
 
         string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.critical,c.high,c.medium,c.low,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = 'trivy'`;
