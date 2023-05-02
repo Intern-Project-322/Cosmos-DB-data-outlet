@@ -15,9 +15,9 @@ final string[] severityList = ["critical","high","medium","low"];
 final string[] resolutionList = ["total","falsePositive","truePositive","batchForPatching","notAThreat","notApplicable", "inadequateInfo","alreadyMitigated","fixed","notAssigned"];
 
 service / on new http:Listener(8090) {
-    resource function get rawTrivyScanData() returns json |error {
+    resource function get newSummaryTrivyScanData() returns json |error {
 
-        string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = 'TrivyNew'`;
+        string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.oldVuln,c.newVuln,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = 'TrivyNew'`;
         time:Utc beforeFetching = time:utcNow();
         int timeBeforeFetching= beforeFetching[0];
         io:println(`Number of seconds before fetching: ${beforeFetching[0]}s`);
