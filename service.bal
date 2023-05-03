@@ -100,6 +100,79 @@ service / on new http:Listener(8090) {
                              "afterParsing":timeafterParsing,
                              "results":outputs};
     }
+    resource function get trivySummaryThreeMonths() returns json|error {
+        string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.oldVuln,c.newVuln,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = 'TrivyNew' AND c.assetOrWebsite = 'wso2am'`;
+        stream<NewSummaryRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "summaryContainer", query);
+        json[] outputs = [];
+        check result.forEach(function(NewSummaryRecord summaryRecord) {
+            VulnCollection oldVuln = summaryRecord.oldVuln;
+            foreach string severity in severityList {
+                SeverityResoutionDetails srDetails = <SeverityResoutionDetails>oldVuln.get(severity);
+                foreach string resolution in resolutionList {
+                    NewFormattedSummaryRecord newSummaryRecord = {};
+                    newSummaryRecord.scannedDate = summaryRecord.scannedDate;
+                    newSummaryRecord.scannerName = summaryRecord.scannerName;
+                    newSummaryRecord.assetOrWebsite = summaryRecord.assetOrWebsite;
+                    newSummaryRecord.assetVersion = summaryRecord.assetVersion;
+                    newSummaryRecord.scanId = summaryRecord.scanId;
+                    newSummaryRecord.url = summaryRecord.url;
+                    newSummaryRecord.linkToVms = summaryRecord.linkToVms;
+                    newSummaryRecord.tags = summaryRecord.tags;
+                    newSummaryRecord.createdTime = summaryRecord.createdTime;
+                    newSummaryRecord.createdDate = summaryRecord.createdDate;
+                    newSummaryRecord.team = summaryRecord.team;
+                    newSummaryRecord.reportID = summaryRecord.reportID;
+                    newSummaryRecord.status = summaryRecord.status; 
+                    newSummaryRecord.status_changed_on = summaryRecord.status_changed_on;
+                    newSummaryRecord.status_changed_by = summaryRecord.status_changed_by;
+                    newSummaryRecord.newOrOld = "old";
+                    newSummaryRecord.severityResoutionType = severity+resolution;
+                    newSummaryRecord.vulnerabilityCount = srDetails.get(resolution);
+
+                    outputs.push(newSummaryRecord);
+                }
+            }
+            VulnCollection newVuln = summaryRecord.newVuln;
+            foreach string severity in severityList {
+                SeverityResoutionDetails srDetails = <SeverityResoutionDetails>newVuln.get(severity);
+                foreach string resolution in resolutionList {
+                    NewFormattedSummaryRecord newSummaryRecord = {};
+                    newSummaryRecord.scannedDate = summaryRecord.scannedDate;
+                    newSummaryRecord.scannerName = summaryRecord.scannerName;
+                    newSummaryRecord.assetOrWebsite = summaryRecord.assetOrWebsite;
+                    newSummaryRecord.assetVersion = summaryRecord.assetVersion;
+                    newSummaryRecord.scanId = summaryRecord.scanId;
+                    newSummaryRecord.url = summaryRecord.url;
+                    newSummaryRecord.linkToVms = summaryRecord.linkToVms;
+                    newSummaryRecord.tags = summaryRecord.tags;
+                    newSummaryRecord.createdTime = summaryRecord.createdTime;
+                    newSummaryRecord.createdDate = summaryRecord.createdDate;
+                    newSummaryRecord.team = summaryRecord.team;
+                    newSummaryRecord.reportID = summaryRecord.reportID;
+                    newSummaryRecord.status = summaryRecord.status; 
+                    newSummaryRecord.status_changed_on = summaryRecord.status_changed_on;
+                    newSummaryRecord.status_changed_by = summaryRecord.status_changed_by;
+                    newSummaryRecord.newOrOld = "new";
+                    newSummaryRecord.severityResoutionType = severity+resolution;
+                    newSummaryRecord.vulnerabilityCount = srDetails.get(resolution);
+
+                    outputs.push(newSummaryRecord);
+                }
+            }
+
+            
+        });
+
+        time:Utc afterParsing = time:utcNow();
+        int timeafterParsing= afterParsing[0];
+        io:println(`Number of seconds after Parsing: ${afterParsing[0]}s`);
+
+        return { "beforeFetching":timeBeforeFetching,
+                             "afterFetching":timeafterFetching,
+                             "afterParsing":timeafterParsing,
+                             "results":outputs};
+    }
+    }
     resource function get summaryTrivyScanData() returns json |error {
 
         string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.critical,c.high,c.medium,c.low,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = 'trivy'`;
