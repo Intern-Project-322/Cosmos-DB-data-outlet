@@ -103,8 +103,8 @@ service / on new http:Listener(8090) {
     resource function get trivySummaryThreeMonths() returns json |error {
 
         //boolean isValid = true;
-        string scannerName = "TrivyNew";
-        string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.oldVuln,c.newVuln,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = `+ scannerName;
+        string hehe = "TrivyNew";
+        string query = "SELECT c.assetOrWebsite,c.assetVersion,c.url,c.oldVuln,c.newVuln,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName ="+ hehe;
         stream<NewSummaryRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "summaryContainer", query);
         json[] outputs = [];
         check result.forEach(function(NewSummaryRecord summaryRecord) {
