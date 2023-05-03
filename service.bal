@@ -100,8 +100,9 @@ service / on new http:Listener(8090) {
                              "afterParsing":timeafterParsing,
                              "results":outputs};
     }
-    resource function get trivySummaryThreeMonths() returns json|error {
-        string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.oldVuln,c.newVuln,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = 'TrivyNew' AND c.assetOrWebsite = 'wso2am'`;
+    resource function get trivySummaryThreeMonths() returns json |error {
+
+        string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.oldVuln,c.newVuln,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = 'TrivyNew'`;
         stream<NewSummaryRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "summaryContainer", query);
         json[] outputs = [];
         check result.forEach(function(NewSummaryRecord summaryRecord) {
@@ -162,16 +163,7 @@ service / on new http:Listener(8090) {
 
             
         });
-
-        time:Utc afterParsing = time:utcNow();
-        int timeafterParsing= afterParsing[0];
-        io:println(`Number of seconds after Parsing: ${afterParsing[0]}s`);
-
-        return { "beforeFetching":timeBeforeFetching,
-                             "afterFetching":timeafterFetching,
-                             "afterParsing":timeafterParsing,
-                             "results":outputs};
-    }
+        return { "results":outputs};
     }
     resource function get summaryTrivyScanData() returns json |error {
 
