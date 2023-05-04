@@ -2,6 +2,7 @@
 import ballerina/time;
 import ballerina/io;
 import ballerina/http;
+//import ballerina/log;
 import ballerinax/azure_cosmosdb as cosmosdb;
 configurable config cosmosConfig =?;
 
@@ -103,67 +104,69 @@ service / on new http:Listener(8090) {
     resource function get trivySummaryThreeMonths() returns json |error {
 
         //boolean isValid = true;
-        string hehe = "TrivyNew";
-        string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.oldVuln,c.newVuln,c.createdDate,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = '${hehe.toString()}'`;
+        string scannerName = "TrivyNew";
+        string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.oldVuln,c.newVuln,c.createdDate ,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = '${scannerName.toString()}'`;
         stream<NewSummaryRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "summaryContainer", query);
         json[] outputs = [];
         check result.forEach(function(NewSummaryRecord summaryRecord) {
-            VulnCollection oldVuln = summaryRecord.oldVuln;
-            foreach string severity in severityList {
-                SeverityResoutionDetails srDetails = <SeverityResoutionDetails>oldVuln.get(severity);
-                foreach string resolution in resolutionList {
-                    NewFormattedSummaryRecord newSummaryRecord = {};
-                    newSummaryRecord.scannedDate = summaryRecord.scannedDate;
-                    newSummaryRecord.scannerName = summaryRecord.scannerName;
-                    newSummaryRecord.assetOrWebsite = summaryRecord.assetOrWebsite;
-                    newSummaryRecord.assetVersion = summaryRecord.assetVersion;
-                    newSummaryRecord.scanId = summaryRecord.scanId;
-                    newSummaryRecord.url = summaryRecord.url;
-                    newSummaryRecord.linkToVms = summaryRecord.linkToVms;
-                    newSummaryRecord.tags = summaryRecord.tags;
-                    newSummaryRecord.createdTime = summaryRecord.createdTime;
-                    newSummaryRecord.createdDate = summaryRecord.createdDate;
-                    newSummaryRecord.team = summaryRecord.team;
-                    newSummaryRecord.reportID = summaryRecord.reportID;
-                    newSummaryRecord.status = summaryRecord.status; 
-                    newSummaryRecord.status_changed_on = summaryRecord.status_changed_on;
-                    newSummaryRecord.status_changed_by = summaryRecord.status_changed_by;
-                    newSummaryRecord.newOrOld = "old";
-                    newSummaryRecord.severityResoutionType = severity+resolution;
-                    newSummaryRecord.vulnerabilityCount = srDetails.get(resolution);
+            io:println(summaryRecord.createdDate);
+            io:println("meka kooooooooooo");
+            if(checkDate(summaryRecord.createdDate)){
+                VulnCollection oldVuln = summaryRecord.oldVuln;
+                foreach string severity in severityList {
+                    SeverityResoutionDetails srDetails = <SeverityResoutionDetails>oldVuln.get(severity);
+                    foreach string resolution in resolutionList {
+                        NewFormattedSummaryRecord newSummaryRecord = {};
+                        newSummaryRecord.scannedDate = summaryRecord.scannedDate;
+                        newSummaryRecord.scannerName = summaryRecord.scannerName;
+                        newSummaryRecord.assetOrWebsite = summaryRecord.assetOrWebsite;
+                        newSummaryRecord.assetVersion = summaryRecord.assetVersion;
+                        newSummaryRecord.scanId = summaryRecord.scanId;
+                        newSummaryRecord.url = summaryRecord.url;
+                        newSummaryRecord.linkToVms = summaryRecord.linkToVms;
+                        newSummaryRecord.tags = summaryRecord.tags;
+                        newSummaryRecord.createdTime = summaryRecord.createdTime;
+                        newSummaryRecord.createdDate = summaryRecord.createdDate;
+                        newSummaryRecord.team = summaryRecord.team;
+                        newSummaryRecord.reportID = summaryRecord.reportID;
+                        newSummaryRecord.status = summaryRecord.status; 
+                        newSummaryRecord.status_changed_on = summaryRecord.status_changed_on;
+                        newSummaryRecord.status_changed_by = summaryRecord.status_changed_by;
+                        newSummaryRecord.newOrOld = "old";
+                        newSummaryRecord.severityResoutionType = severity+resolution;
+                        newSummaryRecord.vulnerabilityCount = srDetails.get(resolution);
 
-                    outputs.push(newSummaryRecord);
+                        outputs.push(newSummaryRecord);
+                    }
                 }
-            }
-            VulnCollection newVuln = summaryRecord.newVuln;
-            foreach string severity in severityList {
-                SeverityResoutionDetails srDetails = <SeverityResoutionDetails>newVuln.get(severity);
-                foreach string resolution in resolutionList {
-                    NewFormattedSummaryRecord newSummaryRecord = {};
-                    newSummaryRecord.scannedDate = summaryRecord.scannedDate;
-                    newSummaryRecord.scannerName = summaryRecord.scannerName;
-                    newSummaryRecord.assetOrWebsite = summaryRecord.assetOrWebsite;
-                    newSummaryRecord.assetVersion = summaryRecord.assetVersion;
-                    newSummaryRecord.scanId = summaryRecord.scanId;
-                    newSummaryRecord.url = summaryRecord.url;
-                    newSummaryRecord.linkToVms = summaryRecord.linkToVms;
-                    newSummaryRecord.tags = summaryRecord.tags;
-                    newSummaryRecord.createdTime = summaryRecord.createdTime;
-                    newSummaryRecord.createdDate = summaryRecord.createdDate;
-                    newSummaryRecord.team = summaryRecord.team;
-                    newSummaryRecord.reportID = summaryRecord.reportID;
-                    newSummaryRecord.status = summaryRecord.status; 
-                    newSummaryRecord.status_changed_on = summaryRecord.status_changed_on;
-                    newSummaryRecord.status_changed_by = summaryRecord.status_changed_by;
-                    newSummaryRecord.newOrOld = "new";
-                    newSummaryRecord.severityResoutionType = severity+resolution;
-                    newSummaryRecord.vulnerabilityCount = srDetails.get(resolution);
+                VulnCollection newVuln = summaryRecord.newVuln;
+                foreach string severity in severityList {
+                    SeverityResoutionDetails srDetails = <SeverityResoutionDetails>newVuln.get(severity);
+                    foreach string resolution in resolutionList {
+                        NewFormattedSummaryRecord newSummaryRecord = {};
+                        newSummaryRecord.scannedDate = summaryRecord.scannedDate;
+                        newSummaryRecord.scannerName = summaryRecord.scannerName;
+                        newSummaryRecord.assetOrWebsite = summaryRecord.assetOrWebsite;
+                        newSummaryRecord.assetVersion = summaryRecord.assetVersion;
+                        newSummaryRecord.scanId = summaryRecord.scanId;
+                        newSummaryRecord.url = summaryRecord.url;
+                        newSummaryRecord.linkToVms = summaryRecord.linkToVms;
+                        newSummaryRecord.tags = summaryRecord.tags;
+                        newSummaryRecord.createdTime = summaryRecord.createdTime;
+                        newSummaryRecord.createdDate = summaryRecord.createdDate;
+                        newSummaryRecord.team = summaryRecord.team;
+                        newSummaryRecord.reportID = summaryRecord.reportID;
+                        newSummaryRecord.status = summaryRecord.status; 
+                        newSummaryRecord.status_changed_on = summaryRecord.status_changed_on;
+                        newSummaryRecord.status_changed_by = summaryRecord.status_changed_by;
+                        newSummaryRecord.newOrOld = "new";
+                        newSummaryRecord.severityResoutionType = severity+resolution;
+                        newSummaryRecord.vulnerabilityCount = srDetails.get(resolution);
 
-                    outputs.push(newSummaryRecord);
+                        outputs.push(newSummaryRecord);
+                    }
                 }
-            }
-
-            
+            }    
         });
         return { "results":outputs};
     }

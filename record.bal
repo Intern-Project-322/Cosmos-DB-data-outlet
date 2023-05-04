@@ -154,7 +154,7 @@ type NewSummaryRecord record {|
     string? linkToVms = "";
     string? tags = "";
     string? createdTime = "";
-    string? createdDate = "";
+    string createdDate = "";
     string? team = "";
     int reportID = 0;
     string? status = "Pending"; 
