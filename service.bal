@@ -106,7 +106,17 @@ service / on new http:Listener(8090) {
         //boolean isValid = true;
         string scannerName = "TrivyNew";
         string query = string `SELECT c.assetOrWebsite,c.assetVersion,c.url,c.oldVuln,c.newVuln,c.createdDate ,c.reportID,c.tags,c.team FROM c  WHERE c.scannerName = '${scannerName.toString()}'`;
+        
+        time:Utc beforeFetching = time:utcNow();
+        int timeBeforeFetching= beforeFetching[0];
+        io:println(`Number of seconds before fetching: ${beforeFetching[0]}s`);
+        
         stream<NewSummaryRecord, error?> result = check azureCosmosClient->queryDocuments("vmsDB", "summaryContainer", query);
+
+        time:Utc afterFetching = time:utcNow();
+        int timeafterFetching= afterFetching[0];
+        io:println(`Number of seconds after fetching: ${afterFetching[0]}s`);
+
         json[] outputs = [];
         check result.forEach(function(NewSummaryRecord summaryRecord) {
             io:println(summaryRecord.createdDate);
@@ -168,7 +178,14 @@ service / on new http:Listener(8090) {
                 }
             }    
         });
-        return { "results":outputs};
+        time:Utc afterParsing = time:utcNow();
+        int timeafterParsing= afterParsing[0];
+        io:println(`Number of seconds after Parsing: ${afterParsing[0]}s`);
+
+        return { "beforeFetching":timeBeforeFetching,
+                             "afterFetching":timeafterFetching,
+                             "afterParsing":timeafterParsing,
+                             "results":outputs};
     }
     resource function get summaryTrivyScanData() returns json |error {
 
